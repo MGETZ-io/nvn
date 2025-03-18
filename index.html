@@ -52,53 +52,63 @@
         button:hover {
             background-color: #e60073;
         }
-        #install-prompt {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            text-align: center;
-            padding: 20px;
-        }
-        #install-prompt button {
-            margin-top: 20px;
-            padding: 10px;
-            background: #ff007f;
-            color: white;
-            border: none;
-            font-size: 18px;
-            cursor: pointer;
+        .info {
+            margin-top: 10px;
+            font-size: 14px;
         }
     </style>
 </head>
 <body>
 
-    <div id="install-prompt">
-        <p>Bitte füge diese App zum Home-Bildschirm hinzu, um sie zu nutzen.</p>
-        <button onclick="window.location.reload()">Ok</button>
-    </div>
-
     <h1>NVN Fahrplanauskunft</h1>
     <div class="container">
-        <p>Die App läuft als Web-App!</p>
+        <label for="start">Startpunkt:</label>
+        <input type="text" id="start" placeholder="Start eingeben...">
+
+        <label for="ziel">Ziel:</label>
+        <input type="text" id="ziel" placeholder="Ziel eingeben...">
+
+        <label for="datum">Datum & Uhrzeit:</label>
+        <input type="datetime-local" id="datum">
+
+        <label for="fahrtart">Fahrtart:</label>
+        <select id="fahrtart">
+            <option value="hin">Hinfahrt</option>
+            <option value="rueck">Rückfahrt</option>
+            <option value="beides">Hin- & Rückfahrt</option>
+        </select>
+
+        <label for="deutschlandticket">
+            <input type="checkbox" id="deutschlandticket"> Deutschland-Ticket vorhanden
+        </label>
+
+        <button onclick="sucheVerbindung()">Verbindung suchen</button>
+
+        <div id="ergebnis" class="info"></div>
     </div>
 
     <script>
-        function isRunningStandalone() {
-            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        }
+        function sucheVerbindung() {
+            let start = document.getElementById("start").value;
+            let ziel = document.getElementById("ziel").value;
+            let datum = document.getElementById("datum").value;
+            let fahrtart = document.getElementById("fahrtart").value;
+            let dticket = document.getElementById("deutschlandticket").checked ? "Ja" : "Nein";
 
-        if (!isRunningStandalone()) {
-            document.getElementById('install-prompt').style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+            if (!start || !ziel) {
+                alert("Bitte Start und Ziel eingeben!");
+                return;
+            }
+
+            let ergebnisText = `
+                <p><strong>Start:</strong> ${start}</p>
+                <p><strong>Ziel:</strong> ${ziel}</p>
+                <p><strong>Datum & Uhrzeit:</strong> ${datum || "Jetzt"}</p>
+                <p><strong>Fahrtart:</strong> ${fahrtart}</p>
+                <p><strong>Deutschland-Ticket:</strong> ${dticket}</p>
+                <p><em>Hier würde die HAFAS API von nah.sh eingebunden werden.</em></p>
+            `;
+            document.getElementById("ergebnis").innerHTML = ergebnisText;
         }
     </script>
 
