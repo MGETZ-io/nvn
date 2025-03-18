@@ -52,29 +52,6 @@
         button:hover {
             background-color: #e60073;
         }
-        #results {
-            margin-top: 20px;
-            text-align: left;
-        }
-        .journey {
-            background: #ff007f;
-            color: white;
-            padding: 10px;
-            margin: 10px 0;
-            border-radius: 5px;
-        }
-        .train-type {
-            font-weight: bold;
-            padding: 5px;
-            border-radius: 5px;
-            display: inline-block;
-            margin-right: 5px;
-        }
-        .RE { background-color: #007bc7; }
-        .RB { background-color: #00a000; }
-        .IC { background-color: #d00000; }
-        .ICE { background-color: #ff0000; }
-        .NBE { background-color: #ff9900; }
         #install-prompt {
             display: none;
             position: fixed;
@@ -111,81 +88,18 @@
 
     <h1>NVN Fahrplanauskunft</h1>
     <div class="container">
-        <form id="journey-form">
-            <label for="from">Startpunkt:</label>
-            <input type="text" id="from" required>
-
-            <label for="to">Zielort:</label>
-            <input type="text" id="to" required>
-
-            <label for="date">Datum und Uhrzeit:</label>
-            <input type="datetime-local" id="date" required>
-
-            <label for="ticket">Deutschland-Ticket:</label>
-            <select id="ticket">
-                <option value="yes">Ja</option>
-                <option value="no">Nein</option>
-            </select>
-
-            <button type="submit">Verbindung suchen</button>
-        </form>
-
-        <div id="results"></div>
+        <p>Die App läuft als Web-App!</p>
     </div>
 
     <script>
-        // Überprüfung, ob die App als Web-App läuft
-        if (window.navigator.standalone !== true) {
-            document.getElementById('install-prompt').style.display = 'flex';
+        function isRunningStandalone() {
+            return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
         }
 
-        document.getElementById('journey-form').addEventListener('submit', async function(event) {
-            event.preventDefault();
-
-            const from = document.getElementById('from').value;
-            const to = document.getElementById('to').value;
-            const date = document.getElementById('date').value;
-            const ticket = document.getElementById('ticket').value;
-            const resultsDiv = document.getElementById('results');
-
-            resultsDiv.innerHTML = "<p>Verbindung wird gesucht...</p>";
-
-            try {
-                const response = await fetch(`https://v6.db.transport.rest/journeys?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&departure=${encodeURIComponent(date)}&results=3`);
-                const data = await response.json();
-
-                resultsDiv.innerHTML = "";
-
-                if (!data.journeys || data.journeys.length === 0) {
-                    resultsDiv.innerHTML = "<p>Keine Verbindung gefunden.</p>";
-                    return;
-                }
-
-                data.journeys.forEach(journey => {
-                    let trainType = "Unbekannt";
-                    if (journey.legs[0].line && journey.legs[0].line.productName) {
-                        trainType = journey.legs[0].line.productName;
-                    }
-
-                    let typeClass = "";
-                    if (trainType.includes("RE")) typeClass = "RE";
-                    else if (trainType.includes("RB")) typeClass = "RB";
-                    else if (trainType.includes("IC")) typeClass = "IC";
-                    else if (trainType.includes("ICE")) typeClass = "ICE";
-                    else if (trainType.includes("NBE")) typeClass = "NBE";
-
-                    resultsDiv.innerHTML += `
-                        <div class="journey">
-                            <span class="train-type ${typeClass}">${trainType}</span>
-                            <p><strong>Abfahrt:</strong> ${new Date(journey.legs[0].departure).toLocaleTimeString()} - <strong>Ankunft:</strong> ${new Date(journey.legs[journey.legs.length - 1].arrival).toLocaleTimeString()}</p>
-                        </div>
-                    `;
-                });
-            } catch (error) {
-                resultsDiv.innerHTML = "<p>Fehler bei der Abfrage. Bitte versuche es später erneut.</p>";
-                console.error(error);
-            }
-        });
+        if (!isRunningStandalone()) {
+            document.getElementById('install-prompt').style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
     </script>
 
 </body>
