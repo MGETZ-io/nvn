@@ -75,9 +75,39 @@
         .IC { background-color: #d00000; }
         .ICE { background-color: #ff0000; }
         .NBE { background-color: #ff9900; }
+        #install-prompt {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 20px;
+        }
+        #install-prompt button {
+            margin-top: 20px;
+            padding: 10px;
+            background: #ff007f;
+            color: white;
+            border: none;
+            font-size: 18px;
+            cursor: pointer;
+        }
     </style>
 </head>
 <body>
+
+    <div id="install-prompt">
+        <p>Bitte füge diese App zum Home-Bildschirm hinzu, um sie zu nutzen.</p>
+        <button onclick="window.location.reload()">Ok</button>
+    </div>
 
     <h1>NVN Fahrplanauskunft</h1>
     <div class="container">
@@ -104,6 +134,11 @@
     </div>
 
     <script>
+        // Überprüfung, ob die App als Web-App läuft
+        if (window.navigator.standalone !== true) {
+            document.getElementById('install-prompt').style.display = 'flex';
+        }
+
         document.getElementById('journey-form').addEventListener('submit', async function(event) {
             event.preventDefault();
 
@@ -116,7 +151,7 @@
             resultsDiv.innerHTML = "<p>Verbindung wird gesucht...</p>";
 
             try {
-                const response = await fetch(`https://v5.db.transport.rest/journeys?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&departure=${encodeURIComponent(date)}&results=3`);
+                const response = await fetch(`https://v6.db.transport.rest/journeys?from=${encodeURIComponent(from)}&to=${encodeURIComponent(to)}&departure=${encodeURIComponent(date)}&results=3`);
                 const data = await response.json();
 
                 resultsDiv.innerHTML = "";
